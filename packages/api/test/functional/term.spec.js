@@ -3,7 +3,8 @@ trait('Test/ApiClient');
 trait('Auth/Client');
 trait('DatabaseTransactions');
 
-const { antl, errors, errorPayload } = require('../../app/Utils');
+const { antl, errors, errorPayload, roles } = require('../../app/Utils');
+const { defaultParams } = require('./params.spec');
 
 const Term = use('App/Models/Term');
 const Taxonomy = use('App/Models/Taxonomy');
@@ -27,24 +28,83 @@ const user = {
 	last_name: 'LastName',
 };
 
+const researcherUser = {
+	email: 'researcherusertesting@gmail.com',
+	password: '123123',
+	first_name: 'FirstName',
+	last_name: 'LastName',
+	role: roles.RESEARCHER,
+};
+
 test('GET terms Get a list of all terms', async ({ client }) => {
 	const testTaxonomy = await Taxonomy.create(taxonomy);
 
 	const testTerm = await testTaxonomy.terms().create({ term: 'testTerm' });
 
-	const loggeduser = await User.create(user);
-
-	const response = await client
-		.get('/terms?perPage=1&order=desc')
-		.loginVia(loggeduser, 'jwt')
-		.end();
+	const response = await client.get('/terms?perPage=1&order=desc').end();
 
 	response.assertStatus(200);
 	response.assertJSONSubset([testTerm.toJSON()]);
 });
 
+test('GET terms and single term with embed and parent', async ({ client }) => {
+	// all parent terms with embedding
+	let terms = await Term.query()
+		.withParams({ ...defaultParams, embed: { all: true, ids: false } })
+		.withFilters({ parent: 0 })
+		.fetch();
+
+	let response = await client.get('/terms?embed&parent=0').end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// default query
+	terms = await Term.query()
+		.withParams({ ...defaultParams })
+		.fetch();
+
+	response = await client.get('/terms').end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// all terms with embedding
+	terms = await Term.query()
+		.withParams({ ...defaultParams, embed: { all: true, ids: false } })
+		.fetch();
+
+	response = await client.get('/terms?embed').end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// terms that has firstTerm as a parent
+	const firstTerm = await Term.query().first();
+
+	terms = await Term.query()
+		.withParams({ ...defaultParams })
+		.withFilters({ parent: firstTerm.id })
+		.fetch();
+
+	response = await client.get(`/terms?parent=${firstTerm.id}`).end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// single term with embed
+	terms = await Term.query()
+		.withParams({ ...defaultParams, id: firstTerm.id })
+		.firstOrFail();
+
+	response = await client.get(`/terms/${firstTerm.id}/?embed`).end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+});
+
 test('POST /terms endpoint fails when sending invalid payload', async ({ client }) => {
-	const loggeduser = await User.create(user);
+	const loggeduser = await User.create(researcherUser);
 
 	const response = await client
 		.post('/terms')
@@ -69,7 +129,7 @@ test('POST /terms endpoint fails when sending invalid payload', async ({ client 
 });
 
 test('POST /terms trying save a term in a inexistent taxonomy.', async ({ client }) => {
-	const loggeduser = await User.create(user);
+	const loggeduser = await User.create(researcherUser);
 
 	const response = await client
 		.post('/terms')
@@ -90,7 +150,7 @@ test('POST /terms trying save a term in a inexistent taxonomy.', async ({ client
 });
 
 test('POST /terms create/save a new Term.', async ({ client }) => {
-	const loggeduser = await User.create(user);
+	const loggeduser = await User.create(researcherUser);
 
 	const response = await client
 		.post('/terms')
@@ -111,7 +171,7 @@ test('GET /terms/:id trying get an inexistent Term', async ({ client }) => {
 	const loggeduser = await User.create(user);
 
 	const response = await client
-		.get(`/terms/999`)
+		.get(`/terms/99999`)
 		.loginVia(loggeduser, 'jwt')
 		.end();
 
@@ -142,6 +202,14 @@ test('GET /terms/:id returns a single Term', async ({ client }) => {
 	response.assertJSONSubset(newTerm.toJSON());
 });
 
+test('GET /terms/:id is able to fetch a term by its slug', async ({ client }) => {
+	const termObject = await Term.query().first();
+	const response = await client.get(`/terms/${termObject.slug}`).end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(termObject.toJSON());
+});
+
 test('PUT /terms/:id trying update a term in a inexistent taxonomy', async ({ client }) => {
 	const testTaxonomy = await Taxonomy.create(taxonomy);
 
@@ -154,7 +222,7 @@ test('PUT /terms/:id trying update a term in a inexistent taxonomy', async ({ cl
 		taxonomyId: 999,
 	};
 
-	const loggeduser = await User.create(user);
+	const loggeduser = await User.create(researcherUser);
 
 	const response = await client
 		.put(`/terms/${newTerm.id}`)
@@ -183,7 +251,7 @@ test('PUT /terms/:id Update Term details', async ({ client }) => {
 		taxonomyId: 1,
 	};
 
-	const loggeduser = await User.create(user);
+	const loggeduser = await User.create(researcherUser);
 
 	const response = await client
 		.put(`/terms/${newTerm.id}`)
@@ -198,7 +266,7 @@ test('PUT /terms/:id Update Term details', async ({ client }) => {
 });
 
 test('DELETE /terms/:id Tryng delete a inexistent Term.', async ({ client }) => {
-	const loggeduser = await User.create(user);
+	const loggeduser = await User.create(researcherUser);
 
 	const response = await client
 		.delete(`/terms/999`)
@@ -221,7 +289,7 @@ test('DELETE /terms/:id Delete a Term with id.', async ({ client }) => {
 		term: 'test term',
 	});
 
-	const loggeduser = await User.create(user);
+	const loggeduser = await User.create(researcherUser);
 
 	const response = await client
 		.delete(`/terms/${newTerm.id}`)
