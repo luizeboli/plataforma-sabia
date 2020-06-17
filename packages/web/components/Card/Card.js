@@ -23,6 +23,8 @@ import {
 	IconsContainer,
 } from './styles';
 
+const defaultThumbnail = 'https://rocketfinalchallenge.s3.amazonaws.com/card-image.jpg';
+
 const Card = ({
 	title,
 	category,
@@ -40,7 +42,7 @@ const Card = ({
 		<Link href={url}>
 			<CardContainer>
 				<ImageContainer>
-					<img src={thumbnail} alt={title} />
+					<img src={thumbnail || defaultThumbnail} alt={title} />
 					<Badge bottom>{category}</Badge>
 				</ImageContainer>
 				<Content>
