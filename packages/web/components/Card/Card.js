@@ -60,10 +60,12 @@ const Card = ({
 								</>
 							)}
 						</PrivateContainer>
-						<LikesContainer>
-							<AiFillHeart color={colors.red} />
-							<span>{likes}</span>
-						</LikesContainer>
+						{likes && (
+							<LikesContainer>
+								<AiFillHeart color={colors.red} />
+								<span>{likes}</span>
+							</LikesContainer>
+						)}
 					</UpContent>
 					<MainTitle>{title}</MainTitle>
 					<TextContainer>
@@ -98,11 +100,16 @@ Card.propTypes = {
 	category: PropTypes.string.isRequired,
 	privateTechnology: PropTypes.bool.isRequired,
 	patent: PropTypes.bool.isRequired,
-	thumbnail: PropTypes.string.isRequired,
+	thumbnail: PropTypes.string,
 	date: PropTypes.instanceOf(Date).isRequired,
-	likes: PropTypes.number.isRequired,
+	likes: PropTypes.number,
 	installation_time: PropTypes.number.isRequired,
 	url: PropTypes.string.isRequired,
+};
+
+Card.defaultProps = {
+	thumbnail: null,
+	likes: null,
 };
 
 export default Card;

@@ -114,6 +114,20 @@ class TechnologyController {
 	}
 
 	/**
+	 * Get technology reviews.
+	 * GET /technologies/:id/review
+	 */
+	async showTechnologyReviews({ params, request }) {
+		const { id } = params;
+		const technology = await Technology.findOrFail(id);
+
+		return technology
+			.reviews()
+			.withParams(request.params, { filterById: false })
+			.fetch();
+	}
+
+	/**
 	 * Delete a technology with id.
 	 * DELETE technologies/:id
 	 */
@@ -234,9 +248,7 @@ class TechnologyController {
 				users = [{ userId: user.id, role: roles.OWNER }];
 			}
 
-			if (users) {
-				await this.syncronizeUsers(trx, users, technology);
-			}
+			await this.syncronizeUsers(trx, users, technology);
 
 			const { terms } = request.only(['terms']);
 			if (terms) {
@@ -244,14 +256,7 @@ class TechnologyController {
 			}
 
 			await commit();
-
-			if (users) {
-				await technology.load('users');
-			}
-
-			if (terms) {
-				await technology.load('terms.taxonomy');
-			}
+			await technology.loadMany(['users', 'terms.taxonomy']);
 		} catch (error) {
 			await trx.rollback();
 			throw error;
@@ -318,8 +323,7 @@ class TechnologyController {
 
 			await commit();
 
-			await technology.load('users');
-			await technology.load('terms.taxonomy');
+			await technology.loadMany(['users', 'terms.taxonomy']);
 		} catch (error) {
 			await trx.rollback();
 			throw error;
