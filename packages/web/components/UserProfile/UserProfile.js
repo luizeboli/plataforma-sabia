@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks';
 import { SafeHtml } from '../SafeHtml';
 
-import { Container, UserMsg, SectionTitle, SectionItem, LogoutButton } from './styles';
+import { Container, UserMsg, SectionTitle, SectionItem } from './styles';
 
 const UserProfile = () => {
 	const { user, logout } = useAuth();
@@ -18,25 +18,33 @@ const UserProfile = () => {
 		logout();
 	};
 
+	const goTo = (route) => {
+		const path = `/user/my-account${route}`;
+		if (router.pathname === path) {
+			return;
+		}
+		router.push(path);
+	};
+
 	return (
 		<Container>
 			<UserMsg>
 				<SafeHtml html={t('welcomeUser', { user: user?.first_name || t('user') })} />
 			</UserMsg>
 			<SectionTitle>{t('userArea')}</SectionTitle>
-			<SectionItem as="a" href="/user/my-account">
+			<SectionItem onClick={() => goTo('')}>
 				<FaRegUserCircle />
 				{t('myProfile')}
 			</SectionItem>
 			<SectionTitle>{t('researcherArea')}</SectionTitle>
-			<SectionItem as="a" href="/user/my-account/technologies">
+			<SectionItem onClick={() => goTo('/technologies')}>
 				<FaRegListAlt />
 				{t('myTechnologies')}
 			</SectionItem>
-			<LogoutButton onClick={handleLogout}>
+			<SectionItem onClick={handleLogout}>
 				<AiOutlineLogout />
 				{t('logout')}
-			</LogoutButton>
+			</SectionItem>
 		</Container>
 	);
 };
