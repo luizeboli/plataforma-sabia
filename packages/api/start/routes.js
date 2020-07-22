@@ -203,6 +203,14 @@ Route.put('/user/change-password', 'UserController.changePassword')
 	.middleware(['auth'])
 	.validator('ChangeUserPassword');
 
+Route.post('/user/change-email', 'UserController.changeEmail')
+	.middleware(['auth'])
+	.validator('ChangeUserEmail');
+
+Route.put('/user/change-email', 'UserController.confirmNewEmail')
+	.middleware(['auth'])
+	.validator('ConfirmNewEmail');
+
 /** BookMarks Routes */
 Route.post('bookmarks', 'UserBookmarkController.store')
 	.middleware(['auth'])
@@ -221,4 +229,16 @@ Route.delete('/user/:id/bookmarks', 'UserBookmarkController.destroy').middleware
 	'auth',
 	getMiddlewarePermissions([permissions.DELETE_BOOKMARK, permissions.DELETE_BOOKMARKS]),
 ]);
+
+/** TechnologyCosts Routes */
+Route.get('/technology/:id/costs', 'TechnologyCostController.show').middleware([
+	'handleParams:technology_costs',
+]);
+Route.put('/technologies/:id/costs', 'TechnologyCostController.update')
+	.middleware([
+		'auth',
+		getMiddlewarePermissions([permissions.UPDATE_TECHNOLOGY, permissions.UPDATE_TECHNOLOGIES]),
+	])
+	.validator('UpdateTechnologyCost');
+
 Route.get('/', 'AppController.index');
