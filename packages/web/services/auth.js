@@ -1,6 +1,20 @@
 import { setCookie } from '../utils/helper';
+import { apiPost, apiGet } from './api';
 
-const baseUrl = process.env.API_URL;
+/**
+ * Normalizes the bookmarks for fill the technology like.
+ *
+ * @param {Array} bookmarks User bookmarks
+ * @returns {number[]}
+ */
+function normalizeBookmarks(bookmarks) {
+	if (!Array.isArray(bookmarks)) {
+		return [];
+	}
+
+	return bookmarks.map((bookmark) => bookmark.id);
+}
+
 /**
  * Attempts to authenticate the provided user within the API.
  *
@@ -10,59 +24,68 @@ const baseUrl = process.env.API_URL;
  * @returns {Promise<{}|boolean>} A promise that resolves to the user or false;
  */
 export async function login(email, password) {
-	const response = await fetch(`${baseUrl}/auth/login`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			email,
-			password,
-		}),
+	const response = await apiPost('auth/login', {
+		email,
+		password,
 	});
-	const result = await response.json();
 
-	if (response.status === 200) {
-		setCookie('token', result.token, 7);
+	if (response.status === 200 && response.data.token) {
+		setCookie('token', response.data.token, 7);
 	}
 
-	return result;
+	return response.data;
 }
 
-export async function getMe(token) {
-	return fetch(`${baseUrl}/user/me`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-		.then((res) => res.json())
-		.catch(() => false);
+/**
+ * Fetches the user data of the authenticated user.
+ *
+ * @param {object} params Optional params.
+ * @param {boolean} [params.embed] Response with embed.
+ * @param {string} token The JWT token
+ */
+export async function getMe(token, params = {}) {
+	const response = await apiGet('user/me', {
+		token,
+		...params,
+	});
+
+	if (response.status !== 200) {
+		return false;
+	}
+
+	if (params.bookmarks && response.data.bookmarks) {
+		response.data.bookmarks = normalizeBookmarks(response.data.bookmarks);
+	}
+
+	return response.data;
 }
 
+/**
+ * Calls the register endpoint.
+ *
+ * @param {string} fullname The full name of the user.
+ * @param {string} email User email.
+ * @param {string} password User password.
+ */
 export async function register(fullname, email, password) {
-	const response = await fetch(`${baseUrl}/auth/register`, {
-		method: 'POST',
-		body: JSON.stringify({
-			full_name: fullname,
-			scope: 'web',
-			email,
-			password,
-		}),
-		headers: { 'Content-Type': 'application/json' },
-	}).then((res) => res.json());
-	return response;
+	return apiPost('auth/register', {
+		full_name: fullname,
+		scope: 'web',
+		email,
+		password,
+	}).then((response) => response.data);
 }
 
+/**
+ * Calls the resend confirmation email endpoint.
+ *
+ * @param {string} email User email.
+ */
 export async function emailConfirmation(email) {
-	const response = await fetch(`${baseUrl}/auth/resend-confirmation-email`, {
-		method: 'POST',
-		body: JSON.stringify({
-			scope: 'web',
-			email,
-		}),
-		headers: { 'Content-Type': 'application/json' },
-	}).then((res) => res.json());
-	return response;
+	return apiPost('auth/resend-confirmation-email', {
+		scope: 'web',
+		email,
+	}).then((response) => response.data);
 }
 
 /**
@@ -70,4 +93,35 @@ export async function emailConfirmation(email) {
  */
 export function logout() {
 	setCookie('token', '');
+}
+
+/**
+ * Handle password resets.
+ *
+ * @param {string} email The email in the system.
+ *
+ * @returns {boolean} The response status.
+ */
+export async function requestPasswordReset(email) {
+	return apiGet('auth/forgot-password', {
+		email,
+		scope: 'web',
+	})
+		.then((response) => response.data)
+		.catch(() => false);
+}
+
+/**
+ * Calls the reset password endpoint.
+ *
+ * @param {string} token The reset password token.
+ * @param {string} password New user password.
+ */
+export async function resetPassword(token, password) {
+	return apiPost('auth/reset-password', {
+		token,
+		password,
+	})
+		.then((response) => response.data)
+		.catch(() => false);
 }

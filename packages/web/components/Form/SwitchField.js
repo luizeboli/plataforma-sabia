@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { InputLabel } from './styles';
+import { InputLabel, Row } from './styles';
+import Help from './Help';
 
 const SWITCH_WIDTH = '80px';
 const SWITCH_HEIGHT = '40px';
@@ -31,12 +33,13 @@ const SwitchLabel = styled.label`
 	cursor: pointer;
 	background: white;
 	border-radius: ${SWITCH_WIDTH};
-	border: 2px solid ${({ checked, theme }) => (checked ? theme.colors.green : theme.colors.blue)};
+	border: 2px solid
+		${({ checked, theme }) => (checked ? theme.colors.secondary : theme.colors.blue)};
 	position: relative;
 	transition: color background-color 0.5s;
 
 	> p {
-		color: ${({ checked, theme }) => (checked ? theme.colors.green : theme.colors.blue)};
+		color: ${({ checked, theme }) => (checked ? theme.colors.secondary : theme.colors.blue)};
 		padding: 0.5em;
 		font-size: 0.8em;
 		font-weight: 700;
@@ -52,7 +55,8 @@ const SwitchLabel = styled.label`
 		height: calc(${SWITCH_HEIGHT} - 6px);
 		border-radius: calc(${SWITCH_HEIGHT} - 5px);
 		transition: 0.2s;
-		background: ${({ checked, theme }) => (checked ? theme.colors.green : theme.colors.blue)};
+		background: ${({ checked, theme }) =>
+			checked ? theme.colors.secondary : theme.colors.blue};
 		box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
 	}
 
@@ -61,10 +65,9 @@ const SwitchLabel = styled.label`
 	}
 `;
 
-const SwitchField = ({ label, form, name, validation }) => {
-	const { register, getValues } = form;
-
-	const [checked, setChecked] = useState(false);
+const SwitchField = ({ label, form, name, help, validation, ...checkboxProps }) => {
+	const { register, watch } = form;
+	const isChecked = watch(name);
 
 	return (
 		<SwitchContainer>
@@ -73,15 +76,16 @@ const SwitchField = ({ label, form, name, validation }) => {
 				type="checkbox"
 				id={name}
 				name={name}
-				onClick={() => {
-					setChecked(getValues(name));
-				}}
 				ref={register(validation)}
+				{...checkboxProps}
 			/>
-			<SwitchLabel htmlFor={name} checked={checked}>
-				<p>{checked ? 'Sim' : 'Não'}</p>
-				<span />
-			</SwitchLabel>
+			<Row>
+				<SwitchLabel htmlFor={name} checked={isChecked}>
+					<p>{isChecked ? 'Sim' : 'Não'}</p>
+					<span />
+				</SwitchLabel>
+				{help && <Help id={name} HelpComponent={help} />}
+			</Row>
 		</SwitchContainer>
 	);
 };
@@ -89,9 +93,11 @@ const SwitchField = ({ label, form, name, validation }) => {
 SwitchField.propTypes = {
 	label: PropTypes.string,
 	name: PropTypes.string.isRequired,
+	help: PropTypes.node,
 	form: PropTypes.shape({
 		getValues: PropTypes.func,
 		register: PropTypes.func,
+		watch: PropTypes.func,
 	}),
 	/**
 	 * @see https://react-hook-form.com/api#register
@@ -102,6 +108,7 @@ SwitchField.propTypes = {
 SwitchField.defaultProps = {
 	form: {},
 	label: '',
+	help: null,
 	validation: {},
 };
 

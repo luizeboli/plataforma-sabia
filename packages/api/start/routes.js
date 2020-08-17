@@ -37,6 +37,7 @@ Route.put('roles/:id', 'RoleController.update')
 Route.delete('roles/:id', 'RoleController.destroy').middleware([
 	'auth',
 	getMiddlewareRoles([roles.ADMIN]),
+	'handleParams',
 ]);
 Route.get('roles', 'RoleController.index').middleware([
 	'auth',
@@ -46,6 +47,7 @@ Route.get('roles', 'RoleController.index').middleware([
 Route.get('roles/:id', 'RoleController.show').middleware([
 	'auth',
 	getMiddlewareRoles([roles.ADMIN]),
+	'handleParams',
 ]);
 
 /** Permission Routes */
@@ -67,12 +69,14 @@ Route.get('permissions', 'PermissionController.index').middleware([
 Route.get('permissions/:id', 'PermissionController.show').middleware([
 	'auth',
 	getMiddlewareRoles([roles.ADMIN]),
+	'handleParams',
 ]);
 
 /** Technology routes */
 Route.post('technologies', 'TechnologyController.store')
 	.middleware(['auth', getMiddlewarePermissions([permissions.CREATE_TECHNOLOGIES])])
 	.validator('StoreTechnology');
+
 Route.post('technologies/:id/users', 'TechnologyController.associateTechnologyUser').middleware([
 	'auth',
 	getMiddlewarePermissions([permissions.UPDATE_TECHNOLOGY, permissions.UPDATE_TECHNOLOGIES]),
@@ -98,17 +102,43 @@ Route.delete(
 ).middleware([
 	'auth',
 	getMiddlewarePermissions([permissions.UPDATE_TECHNOLOGY, permissions.UPDATE_TECHNOLOGIES]),
+	'handleParams',
 ]);
 
 Route.get('technologies', 'TechnologyController.index').middleware(['handleParams']);
-Route.get('technologies/:id', 'TechnologyController.show').middleware(['auth']);
+Route.get('technologies/:id', 'TechnologyController.show').middleware(['handleParams']);
 
 Route.get('technologies/:id/terms', 'TechnologyController.showTechnologyTerms').middleware([
 	'auth',
+	'handleParams',
 ]);
 
 Route.get('technologies/:id/users', 'TechnologyController.showTechnologyUsers').middleware([
 	'auth',
+]);
+
+Route.get('technologies/:id/reviews', 'TechnologyController.showTechnologyReviews').middleware([
+	'handleParams',
+]);
+
+/** Technology Review routes */
+Route.get('technology_reviews', 'TechnologyReviewController.index').middleware(['handleParams']);
+Route.post('reviews', 'TechnologyReviewController.store')
+	.middleware(['auth', getMiddlewarePermissions([permissions.CREATE_TECHNOLOGY_REVIEWS])])
+	.validator('StoreTechnologyReview');
+Route.get('technology_reviews/:id', 'TechnologyReviewController.show').middleware(['handleParams']);
+Route.put('reviews/:id', 'TechnologyReviewController.update')
+	.middleware([
+		'auth',
+		getMiddlewarePermissions([
+			permissions.UPDATE_TECHNOLOGY_REVIEW,
+			permissions.UPDATE_TECHNOLOGY_REVIEWS,
+		]),
+	])
+	.validator('UpdateTechnologyReview');
+Route.delete('reviews/:id', 'TechnologyReviewController.destroy').middleware([
+	'auth',
+	getMiddlewareRoles([roles.ADMIN]),
 ]);
 
 /** Taxonomy routes */
@@ -119,23 +149,25 @@ Route.group(() => {
 }).middleware(['auth', getMiddlewareRoles([roles.ADMIN])]);
 
 Route.get('taxonomies', 'TaxonomyController.index').middleware(['handleParams']);
-Route.get('taxonomies/:id', 'TaxonomyController.show');
-Route.get('taxonomies/:id/terms', 'TaxonomyController.showTerms');
+Route.get('taxonomies/:id', 'TaxonomyController.show').middleware(['handleParams']);
+Route.get('taxonomies/:id/terms', 'TaxonomyController.showTerms').middleware(['handleParams']);
 
 /** Term routes */
 Route.post('terms', 'TermController.store')
 	.middleware(['auth', getMiddlewarePermissions([permissions.CREATE_TERMS])])
 	.validator('StoreTerm');
-Route.put('terms/:id', 'TermController.update').middleware([
-	'auth',
-	getMiddlewarePermissions([permissions.UPDATE_TERMS]),
-]);
+Route.put('terms/:id', 'TermController.update')
+	.middleware(['auth', getMiddlewarePermissions([permissions.UPDATE_TERMS])])
+	.validator('UpdateTerm');
+Route.put('terms/:id/meta', 'TermController.updateMeta')
+	.middleware(['auth', getMiddlewarePermissions([permissions.UPDATE_TERMS])])
+	.validator('UpdateMeta');
 Route.delete('terms/:id', 'TermController.destroy').middleware([
 	'auth',
 	getMiddlewarePermissions([permissions.DELETE_TERMS]),
 ]);
 Route.get('terms', 'TermController.index').middleware(['handleParams']);
-Route.get('terms/:id', 'TermController.show');
+Route.get('terms/:id', 'TermController.show').middleware(['handleParams']);
 
 /** User Routes */
 Route.get('users', 'UserController.index').middleware([
@@ -149,6 +181,7 @@ Route.post('users', 'UserController.store')
 Route.get('users/:id', 'UserController.show').middleware([
 	'auth',
 	getMiddlewarePermissions([permissions.VIEW_USERS, permissions.VIEW_USER]),
+	'handleParams',
 ]);
 
 Route.put('users/:id', 'UserController.update')
@@ -168,4 +201,58 @@ Route.delete('users/:id', 'UserController.destroy').middleware([
 ]);
 
 Route.get('/user/me', 'AuthController.getMe').middleware(['auth']);
+Route.put('/user/change-password', 'UserController.changePassword')
+	.middleware(['auth'])
+	.validator('ChangeUserPassword');
+
+Route.post('/user/change-email', 'UserController.changeEmail')
+	.middleware(['auth'])
+	.validator('ChangeUserEmail');
+
+Route.put('/user/change-email', 'UserController.confirmNewEmail').validator('ConfirmNewEmail');
+
+/** BookMarks Routes */
+Route.post('bookmarks', 'UserBookmarkController.store')
+	.middleware(['auth'])
+	.validator('StoreUserBookmark');
+Route.get('/user/:id/bookmarks', 'UserBookmarkController.show').middleware([
+	'auth',
+	getMiddlewarePermissions([permissions.LIST_BOOKMARK, permissions.LIST_BOOKMARKS]),
+	'handleParams',
+]);
+Route.get('user_bookmarks', 'UserBookmarkController.index').middleware([
+	'auth',
+	getMiddlewarePermissions([permissions.LIST_BOOKMARKS]),
+	'handleParams',
+]);
+Route.delete('/user/:id/bookmarks', 'UserBookmarkController.destroy').middleware([
+	'auth',
+	getMiddlewarePermissions([permissions.DELETE_BOOKMARK, permissions.DELETE_BOOKMARKS]),
+]);
+
+/** TechnologyCosts Routes */
+Route.get('/technologies/:id/costs', 'TechnologyCostController.show').middleware([
+	'handleParams:technology_costs',
+]);
+Route.put('/technologies/:id/costs', 'TechnologyCostController.update')
+	.middleware([
+		'auth',
+		getMiddlewarePermissions([permissions.UPDATE_TECHNOLOGY, permissions.UPDATE_TECHNOLOGIES]),
+	])
+	.validator('UpdateTechnologyCost');
+
+/** Uploads */
+Route.post('/uploads', 'UploadController.store').middleware([
+	'auth',
+	getMiddlewarePermissions([permissions.CREATE_UPLOADS]),
+	'uploadAuthorization',
+]);
+Route.delete('/uploads/:id', 'UploadController.destroy').middleware([
+	'auth',
+	getMiddlewarePermissions([permissions.DELETE_UPLOADS, permissions.DELETE_UPLOAD]),
+]);
+Route.get('/uploads', 'UploadController.index').middleware(['handleParams']);
+Route.get('/uploads/:filename', 'UploadController.show');
+Route.get('/uploads/:object/:filename', 'UploadController.showWithObject');
+
 Route.get('/', 'AppController.index');

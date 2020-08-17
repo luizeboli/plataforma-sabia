@@ -3,7 +3,7 @@
 
 const Role = use('App/Models/Role');
 
-const { antl, errors, errorPayload } = require('../../Utils');
+const { errors, errorPayload } = require('../../Utils');
 /**
  * Resourceful controller for interacting with roles
  */
@@ -14,6 +14,7 @@ class RoleController {
 	 */
 	async index({ request }) {
 		return Role.query()
+			.with('permissions', (builder) => builder.select('id'))
 			.withParams(request.params)
 			.fetch();
 	}
@@ -23,18 +24,27 @@ class RoleController {
 	 * POST roles
 	 */
 	async store({ request }) {
-		const { role, description } = request.all();
-
-		return Role.create({ role, description });
+		const { role, description, permissions } = request.all();
+		const newRole = await Role.create({ role, description });
+		if (permissions) {
+			await newRole.permissions().detach();
+			await newRole.permissions().attach(permissions);
+		}
+		return Role.query()
+			.with('permissions', (builder) => builder.select('id'))
+			.where('id', newRole.id)
+			.firstOrFail();
 	}
 
 	/**
 	 * Display a single role.
 	 * GET roles/:id
 	 */
-	async show({ params }) {
-		const { id } = params;
-		return Role.findOrFail(id);
+	async show({ request }) {
+		return Role.query()
+			.with('permissions', (builder) => builder.select('id'))
+			.withParams(request.params)
+			.firstOrFail();
 	}
 
 	/**
@@ -44,8 +54,12 @@ class RoleController {
 	async update({ params, request }) {
 		const { id } = params;
 		const upRole = await Role.findOrFail(id);
-		const { role, description } = request.all();
-		upRole.merge({ role, description });
+		const { description, permissions } = request.all();
+		upRole.merge({ description });
+		if (permissions) {
+			await upRole.permissions().detach();
+			await upRole.permissions().attach(permissions);
+		}
 		await upRole.save();
 		return upRole.toJSON();
 	}
@@ -54,7 +68,7 @@ class RoleController {
 	 * Delete a role with id.
 	 * DELETE roles/:id
 	 */
-	async destroy({ params, response }) {
+	async destroy({ params, request, response }) {
 		const { id } = params;
 		const role = await Role.findOrFail(id);
 		const result = await role.delete();
@@ -64,7 +78,7 @@ class RoleController {
 				.send(
 					errorPayload(
 						errors.RESOURCE_DELETED_ERROR,
-						antl('error.resource.resourceDeletedError'),
+						request.antl('error.resource.resourceDeletedError'),
 					),
 				);
 		}

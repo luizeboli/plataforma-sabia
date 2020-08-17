@@ -1,0 +1,12 @@
+{
+  "favoriteTechnologies": "Favorite technologies",
+  "logout": "Logout",
+  "messages": "Messages",
+  "myNegotiations": "My negotiations",
+  "myProfile": "My profile",
+  "myTechnologies": "My technologies",
+  "researcherArea": "RESEARCHER AREA",
+  "user": "User",
+  "userArea": "USER AREA",
+  "welcomeUser": "Hi, <span>{{user}}</span>"
+}

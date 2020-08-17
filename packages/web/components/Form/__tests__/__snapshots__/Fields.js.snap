@@ -9,10 +9,10 @@ exports[`CheckBoxField works as expected 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
   padding: 1rem;
   font: 1.2rem;
 }
@@ -26,6 +26,7 @@ exports[`CheckBoxField works as expected 1`] = `
 
 .c3 {
   width: 100%;
+  color: hsla(0,0%,40%);
 }
 
 .c0 {
@@ -76,6 +77,13 @@ exports[`InputField does not trigger validation if not required 1`] = `
 .c1 {
   font-size: 1.4rem;
   line-height: 14px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 .c1 > div.wrapper {
@@ -88,13 +96,7 @@ exports[`InputField does not trigger validation if not required 1`] = `
 .c2 {
   color: hsla(0,0%,40%);
   font-size: 1.4rem;
-  font-weight: 600;
-}
-
-.c5 {
-  color: hsla(38,100%,51%);
-  margin: 0 0 1rem 0;
-  display: inline-block;
+  font-weight: 500;
 }
 
 .c3 {
@@ -102,18 +104,47 @@ exports[`InputField does not trigger validation if not required 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
 }
 
 .c4 {
   width: 100%;
   height: 4.4rem;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   margin: 0.5rem 0;
   padding: 1.2rem;
-  background: white;
+  background: hsla(0,0%,100%);
   border: 1px solid hsla(0,0%,80%);
   border-radius: 0.2rem;
   color: hsla(0,0%,40%);
+  opacity: 1;
+}
+
+.c4::-webkit-input-placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
+}
+
+.c4::-moz-placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
+}
+
+.c4:-ms-input-placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
+}
+
+.c4::placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
 }
 
 .c0 {
@@ -161,9 +192,6 @@ exports[`InputField does not trigger validation if not required 1`] = `
           type="text"
         />
       </div>
-      <span
-        class="c5"
-      />
     </div>
   </form>
 </div>
@@ -173,6 +201,13 @@ exports[`InputField renders properly and on submit shows validation errors 1`] =
 .c1 {
   font-size: 1.4rem;
   line-height: 14px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 .c1 > div.wrapper {
@@ -183,21 +218,21 @@ exports[`InputField renders properly and on submit shows validation errors 1`] =
 }
 
 .c1 > input {
-  border: 1px solid hsla(38,100%,51%);
+  border: 1px solid hsla(29,94%,62%);
 }
 
 .c1 > .react-select-container .react-select__control {
-  border-color: hsla(38,100%,51%);
+  border-color: hsla(29,94%,62%);
 }
 
 .c2 {
   color: hsla(0,0%,40%);
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .c6 {
-  color: hsla(38,100%,51%);
+  color: hsla(4,85%,57%);
   margin: 0 0 1rem 0;
   display: inline-block;
 }
@@ -207,6 +242,10 @@ exports[`InputField renders properly and on submit shows validation errors 1`] =
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
 }
 
 .c5 {
@@ -226,13 +265,38 @@ exports[`InputField renders properly and on submit shows validation errors 1`] =
 .c4 {
   width: 100%;
   height: 4.4rem;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   margin: 0.5rem 0;
   padding: 1.2rem;
-  background: white;
+  background: hsla(0,0%,100%);
   border: 1px solid hsla(0,0%,80%);
   border-radius: 0.2rem;
   color: hsla(0,0%,40%);
+  opacity: 1;
+}
+
+.c4::-webkit-input-placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
+}
+
+.c4::-moz-placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
+}
+
+.c4:-ms-input-placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
+}
+
+.c4::placeholder {
+  color: hsla(0,0%,52%);
+  font-weight: 300;
+  font-style: italic;
 }
 
 .c0 {
@@ -297,7 +361,7 @@ exports[`InputField renders properly and on submit shows validation errors 1`] =
           />
         </svg>
         <div
-          class="__react_component_tooltip uuid place-right type-dark"
+          class="__react_component_tooltip uuid place-bottom type-dark"
           data-id="tooltip"
           id="test-input"
         >
@@ -397,6 +461,13 @@ exports[`SelectField does not trigger validation if not required 1`] = `
 .c1 {
   font-size: 1.4rem;
   line-height: 14px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 .c1 > div.wrapper {
@@ -409,13 +480,7 @@ exports[`SelectField does not trigger validation if not required 1`] = `
 .c2 {
   color: hsla(0,0%,40%);
   font-size: 1.4rem;
-  font-weight: 600;
-}
-
-.c5 {
-  color: hsla(38,100%,51%);
-  margin: 0 0 1rem 0;
-  display: inline-block;
+  font-weight: 500;
 }
 
 .c3 {
@@ -423,12 +488,16 @@ exports[`SelectField does not trigger validation if not required 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
 }
 
 .c4 {
   width: 100%;
   margin: 1rem 0;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 .c0 {
@@ -539,9 +608,6 @@ exports[`SelectField does not trigger validation if not required 1`] = `
           />
         </div>
       </div>
-      <span
-        class="c5"
-      />
     </div>
   </form>
 </div>
@@ -551,6 +617,13 @@ exports[`SelectField renders properly and on submit shows validation errors 1`] 
 .c1 {
   font-size: 1.4rem;
   line-height: 14px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 .c1 > div.wrapper {
@@ -561,21 +634,21 @@ exports[`SelectField renders properly and on submit shows validation errors 1`] 
 }
 
 .c1 > input {
-  border: 1px solid hsla(38,100%,51%);
+  border: 1px solid hsla(29,94%,62%);
 }
 
 .c1 > .react-select-container .react-select__control {
-  border-color: hsla(38,100%,51%);
+  border-color: hsla(29,94%,62%);
 }
 
 .c2 {
   color: hsla(0,0%,40%);
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .c6 {
-  color: hsla(38,100%,51%);
+  color: hsla(4,85%,57%);
   margin: 0 0 1rem 0;
   display: inline-block;
 }
@@ -585,6 +658,10 @@ exports[`SelectField renders properly and on submit shows validation errors 1`] 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
 }
 
 .c5 {
@@ -604,7 +681,7 @@ exports[`SelectField renders properly and on submit shows validation errors 1`] 
 .c4 {
   width: 100%;
   margin: 1rem 0;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 .c0 {
@@ -732,7 +809,7 @@ exports[`SelectField renders properly and on submit shows validation errors 1`] 
           />
         </svg>
         <div
-          class="__react_component_tooltip uuid place-right type-dark"
+          class="__react_component_tooltip uuid place-bottom type-dark"
           data-id="tooltip"
           id="test-input"
         >
@@ -832,7 +909,18 @@ exports[`SwitchField works as expected 1`] = `
 .c2 {
   color: hsla(0,0%,40%);
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: 500;
+}
+
+.c4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
 }
 
 .c1 {
@@ -852,7 +940,7 @@ exports[`SwitchField works as expected 1`] = `
   transform: translateX(-100%);
 }
 
-.c4 {
+.c5 {
   width: 80px;
   height: 40px;
   margin-top: 0.5rem;
@@ -877,7 +965,7 @@ exports[`SwitchField works as expected 1`] = `
   transition: color background-color 0.5s;
 }
 
-.c4 > p {
+.c5 > p {
   color: hsla(204,70%,53%);
   padding: 0.5em;
   font-size: 0.8em;
@@ -885,7 +973,7 @@ exports[`SwitchField works as expected 1`] = `
   text-transform: uppercase;
 }
 
-.c4 > span {
+.c5 > span {
   content: '';
   position: absolute;
   top: 1px;
@@ -899,7 +987,7 @@ exports[`SwitchField works as expected 1`] = `
   box-shadow: 0 0 2px 0 rgba(10,10,10,0.29);
 }
 
-.c4:active span {
+.c5:active span {
   width: calc(40px + 10px);
 }
 
@@ -940,15 +1028,19 @@ exports[`SwitchField works as expected 1`] = `
         name="test-input"
         type="checkbox"
       />
-      <label
+      <div
         class="c4"
-        for="test-input"
       >
-        <p>
-          Não
-        </p>
-        <span />
-      </label>
+        <label
+          class="c5"
+          for="test-input"
+        >
+          <p>
+            Não
+          </p>
+          <span />
+        </label>
+      </div>
     </div>
   </form>
 </div>
@@ -958,6 +1050,13 @@ exports[`TextField does not trigger validation if not required 1`] = `
 .c1 {
   font-size: 1.4rem;
   line-height: 14px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 .c1 > div.wrapper {
@@ -970,11 +1069,11 @@ exports[`TextField does not trigger validation if not required 1`] = `
 .c2 {
   color: hsla(0,0%,40%);
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .c5 {
-  color: hsla(38,100%,51%);
+  color: hsla(4,85%,57%);
   margin: 0 0 1rem 0;
   display: inline-block;
 }
@@ -984,12 +1083,16 @@ exports[`TextField does not trigger validation if not required 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
 }
 
 .c4 {
   width: 100%;
   height: 12rem;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   margin: 0.5rem 0;
   padding: 1rem;
   background: white;
@@ -1054,6 +1157,13 @@ exports[`TextField renders properly and on submit shows validation errors 1`] = 
 .c1 {
   font-size: 1.4rem;
   line-height: 14px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 .c1 > div.wrapper {
@@ -1064,21 +1174,21 @@ exports[`TextField renders properly and on submit shows validation errors 1`] = 
 }
 
 .c1 > input {
-  border: 1px solid hsla(38,100%,51%);
+  border: 1px solid hsla(29,94%,62%);
 }
 
 .c1 > .react-select-container .react-select__control {
-  border-color: hsla(38,100%,51%);
+  border-color: hsla(29,94%,62%);
 }
 
 .c2 {
   color: hsla(0,0%,40%);
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .c6 {
-  color: hsla(38,100%,51%);
+  color: hsla(4,85%,57%);
   margin: 0 0 1rem 0;
   display: inline-block;
 }
@@ -1088,6 +1198,10 @@ exports[`TextField renders properly and on submit shows validation errors 1`] = 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
 }
 
 .c5 {
@@ -1107,7 +1221,7 @@ exports[`TextField renders properly and on submit shows validation errors 1`] = 
 .c4 {
   width: 100%;
   height: 12rem;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   margin: 0.5rem 0;
   padding: 1rem;
   background: white;
@@ -1177,7 +1291,7 @@ exports[`TextField renders properly and on submit shows validation errors 1`] = 
           />
         </svg>
         <div
-          class="__react_component_tooltip uuid place-right type-dark"
+          class="__react_component_tooltip uuid place-bottom type-dark"
           data-id="tooltip"
           id="test-input"
         >

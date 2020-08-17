@@ -4,6 +4,7 @@ const ROLES = {
 	INVESTOR: 'INVESTOR',
 	REVIEWER: 'REVIEWER',
 	ADMIN: 'ADMIN',
+	OWNER: 'OWNER',
 };
 
 const PERMISSIONS = {
@@ -100,6 +101,23 @@ const PERMISSIONS = {
 		permission: 'delete-technology',
 		description: 'Permite excluir a própria tecnologia no sistema',
 	},
+	// technology reviews
+	CREATE_TECHNOLOGY_REVIEWS: {
+		permission: 'create-technology-reviews',
+		description: 'Permite criar revisões de tecnologias no sistema',
+	},
+	UPDATE_TECHNOLOGY_REVIEWS: {
+		permission: 'update-technology-reviews',
+		description: 'Permite editar revisões de tecnologias no sistema',
+	},
+	UPDATE_TECHNOLOGY_REVIEW: {
+		permission: 'update-technology-review',
+		description: 'Permite editar a própria revisão de tecnologia no sistema',
+	},
+	DELETE_TECHNOLOGY_REVIEWS: {
+		permission: 'delete-technology-reviews',
+		description: 'Permite excluir revisões de tecnologias no sistema',
+	},
 	// Users
 	CREATE_USERS: {
 		permission: 'create-users',
@@ -133,6 +151,36 @@ const PERMISSIONS = {
 		permission: 'delete-user',
 		description: 'Permite excluir o próprio usuário no sistema',
 	},
+	// Bookmarks
+	LIST_BOOKMARK: {
+		permission: 'list-bookmark',
+		description: 'Permite listar os favoritos do usuário logado',
+	},
+	LIST_BOOKMARKS: {
+		permission: 'list-bookmarks',
+		description: 'Permite listar os favoritos de qualquer usuário',
+	},
+	DELETE_BOOKMARK: {
+		permission: 'delete-bookmark',
+		description: 'Permite excluir os favoritos do próprio usuário no sistema',
+	},
+	DELETE_BOOKMARKS: {
+		permission: 'delete-bookmarks',
+		description: 'Permite excluir os favoritos de qualquer usuário no sistema',
+	},
+	// Uploads
+	CREATE_UPLOADS: {
+		permission: 'create-uploads',
+		description: 'Permite realizar uploads',
+	},
+	DELETE_UPLOAD: {
+		permission: 'delete-upload',
+		description: 'Permite excluir os uploads do próprio usuário no sistema',
+	},
+	DELETE_UPLOADS: {
+		permission: 'delete-uploads',
+		description: 'Permite excluir os uploads de qualquer usuário no sistema',
+	},
 };
 
 const DEFAULT_USER = [
@@ -140,6 +188,8 @@ const DEFAULT_USER = [
 	PERMISSIONS.UPDATE_USER,
 	PERMISSIONS.VIEW_USER,
 	PERMISSIONS.DELETE_USER,
+	PERMISSIONS.LIST_BOOKMARK,
+	PERMISSIONS.DELETE_BOOKMARK,
 ];
 const RESEARCHER = [
 	...DEFAULT_USER,

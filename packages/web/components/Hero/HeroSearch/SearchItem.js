@@ -5,10 +5,11 @@ import { SearchItemContainer, SearchItemImage, SearchItemText } from './styles';
 import { CustomHighlight } from '../../Algolia';
 
 const SearchItem = ({ hit }) => {
-	const { title, thumbnail, id } = hit;
-	const url = `/technology/${id}`;
+	const { title, thumbnail, slug } = hit;
+	const dynamicTechnologyRoute = '/t/[technology]';
+	const url = `/t/${slug}`;
 	return (
-		<Link href={url}>
+		<Link href={dynamicTechnologyRoute} as={url}>
 			<SearchItemContainer>
 				<SearchItemImage>
 					<img src={thumbnail} alt={title} />
@@ -26,7 +27,7 @@ SearchItem.propTypes = {
 	hit: PropTypes.shape({
 		title: PropTypes.string,
 		thumbnail: PropTypes.string,
-		id: PropTypes.number,
+		slug: PropTypes.string,
 	}).isRequired,
 };
 

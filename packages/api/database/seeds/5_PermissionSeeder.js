@@ -59,6 +59,17 @@ class PermissionSeeder {
 			permissions.DELETE_TECHNOLOGY,
 		]);
 
+		/** TECHNOLOGY REVIEW MANAGEMENT */
+		const technologyReviewsPermissions = await Permission.createMany([
+			permissions.CREATE_TECHNOLOGY_REVIEWS,
+			permissions.UPDATE_TECHNOLOGY_REVIEWS,
+			permissions.DELETE_TECHNOLOGY_REVIEWS,
+		]);
+
+		const technologyReviewPermissions = await Permission.createMany([
+			permissions.UPDATE_TECHNOLOGY_REVIEW,
+		]);
+
 		/** USER MANAGEMENT */
 		const usersPermissions = await Permission.createMany([
 			permissions.CREATE_USERS,
@@ -74,6 +85,23 @@ class PermissionSeeder {
 			permissions.DELETE_USER,
 		]);
 
+		/** USERBOOKMARS MANAGEMENT */
+		const bookmarksPermissions = await Permission.createMany([
+			permissions.LIST_BOOKMARKS,
+			permissions.DELETE_BOOKMARKS,
+		]);
+		const bookmarkPermissions = await Permission.createMany([
+			permissions.LIST_BOOKMARK,
+			permissions.DELETE_BOOKMARK,
+		]);
+
+		/** UPLOADS MANAGEMENT */
+		const uploadsPermissions = await Permission.createMany([
+			permissions.CREATE_UPLOADS,
+			permissions.DELETE_UPLOADS,
+		]);
+		const uploadPermissions = await Permission.createMany([permissions.DELETE_UPLOAD]);
+
 		/** ADMIN ROLE */
 		/** The ADMIN user has all permissions */
 		const adminPermissionsIds = [
@@ -82,7 +110,10 @@ class PermissionSeeder {
 			...taxonomiesPermissions,
 			...termsPermissions,
 			...technologiesPermissions,
+			...technologyReviewsPermissions,
 			...usersPermissions,
+			...bookmarksPermissions,
+			...uploadsPermissions,
 		].map((permission) => permission.id);
 		const adminRole = await Role.getRole(roles.ADMIN);
 		await adminRole.permissions().attach(adminPermissionsIds);
@@ -92,19 +123,31 @@ class PermissionSeeder {
 			...technologyPermissions,
 			...userPermissions,
 			...termsPermissions,
+			...technologyReviewPermissions,
+			...bookmarkPermissions,
+			...uploadPermissions,
 		].map((permission) => permission.id);
 
 		const researcherRole = await Role.getRole(roles.RESEARCHER);
 		await researcherRole
 			.permissions()
-			.attach([technologiesPermissions[0].id, ...researcherPermissions]);
+			.attach([
+				technologiesPermissions[0].id,
+				technologyReviewsPermissions[0].id,
+				uploadsPermissions[0].id,
+				...researcherPermissions,
+			]);
 
 		/** DEFAULT_USER ROLE */
 		const defaultUserRole = await Role.getRole(roles.DEFAULT_USER);
-		const defaultUserPermissions = userPermissions.map((up) => up.id);
 		await defaultUserRole
 			.permissions()
-			.attach([technologiesPermissions[0].id, ...defaultUserPermissions]);
+			.attach([
+				technologiesPermissions[0].id,
+				technologyReviewsPermissions[0].id,
+				uploadsPermissions[0].id,
+				...researcherPermissions,
+			]);
 	}
 }
 

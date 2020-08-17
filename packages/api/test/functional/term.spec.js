@@ -4,8 +4,10 @@ trait('Auth/Client');
 trait('DatabaseTransactions');
 
 const { antl, errors, errorPayload, roles } = require('../../app/Utils');
+const { defaultParams } = require('./params.spec');
 
 const Term = use('App/Models/Term');
+const TermMeta = use('App/Models/TermMeta');
 const Taxonomy = use('App/Models/Taxonomy');
 const User = use('App/Models/User');
 
@@ -40,15 +42,66 @@ test('GET terms Get a list of all terms', async ({ client }) => {
 
 	const testTerm = await testTaxonomy.terms().create({ term: 'testTerm' });
 
-	const loggeduser = await User.create(user);
-
-	const response = await client
-		.get('/terms?perPage=1&order=desc')
-		.loginVia(loggeduser, 'jwt')
-		.end();
+	const response = await client.get('/terms?perPage=1&order=desc').end();
 
 	response.assertStatus(200);
 	response.assertJSONSubset([testTerm.toJSON()]);
+});
+
+test('GET terms and single term with embed and parent', async ({ client }) => {
+	// all parent terms with embedding
+	let terms = await Term.query()
+		.withParams({ ...defaultParams, embed: { all: true, ids: false } })
+		.withFilters({ parent: 0 })
+		.fetch();
+
+	let response = await client.get('/terms?embed&parent=0').end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// default query
+	terms = await Term.query()
+		.withParams({ ...defaultParams })
+		.fetch();
+
+	response = await client.get('/terms').end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// all terms with embedding
+	terms = await Term.query()
+		.withParams({ ...defaultParams, embed: { all: true, ids: false } })
+		.fetch();
+
+	response = await client.get('/terms?embed').end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// terms that has firstTerm as a parent
+	const firstTerm = await Term.query().first();
+
+	terms = await Term.query()
+		.withParams({ ...defaultParams })
+		.withFilters({ parent: firstTerm.id })
+		.fetch();
+
+	response = await client.get(`/terms?parent=${firstTerm.id}`).end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
+
+	// single term with embed
+	terms = await Term.query()
+		.withParams({ ...defaultParams, id: firstTerm.id })
+		.firstOrFail();
+
+	response = await client.get(`/terms/${firstTerm.id}/?embed`).end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(terms.toJSON());
 });
 
 test('POST /terms endpoint fails when sending invalid payload', async ({ client }) => {
@@ -115,11 +168,41 @@ test('POST /terms create/save a new Term.', async ({ client }) => {
 	response.assertJSONSubset(termCreated.toJSON());
 });
 
+test('POST /terms create/save a new Term with Metadata.', async ({ client }) => {
+	const loggeduser = await User.create(researcherUser);
+
+	const metas = [
+		{
+			meta_key: 'test-meta-key-1',
+			meta_value: 'test meta value 1',
+		},
+		{
+			meta_key: 'test-meta-key-2',
+			meta_value: 'test meta value 2',
+		},
+		{
+			meta_key: 'test-meta-key-3',
+			meta_value: 'test meta value 3',
+		},
+	];
+
+	const response = await client
+		.post('/terms')
+		.send({ ...term, metas })
+		.loginVia(loggeduser, 'jwt')
+		.end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset({
+		metas,
+	});
+});
+
 test('GET /terms/:id trying get an inexistent Term', async ({ client }) => {
 	const loggeduser = await User.create(user);
 
 	const response = await client
-		.get(`/terms/999`)
+		.get(`/terms/99999`)
 		.loginVia(loggeduser, 'jwt')
 		.end();
 
@@ -148,6 +231,14 @@ test('GET /terms/:id returns a single Term', async ({ client }) => {
 
 	response.assertStatus(200);
 	response.assertJSONSubset(newTerm.toJSON());
+});
+
+test('GET /terms/:id is able to fetch a term by its slug', async ({ client }) => {
+	const termObject = await Term.query().first();
+	const response = await client.get(`/terms/${termObject.slug}`).end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(termObject.toJSON());
 });
 
 test('PUT /terms/:id trying update a term in a inexistent taxonomy', async ({ client }) => {
@@ -202,6 +293,163 @@ test('PUT /terms/:id Update Term details', async ({ client }) => {
 	response.assertStatus(200);
 	response.assertJSONSubset({
 		term: updatedTerm.term,
+	});
+});
+
+test('PUT /terms/:id update Term with new metadata', async ({ client }) => {
+	const testTaxonomy = await Taxonomy.create(taxonomy);
+
+	const newTerm = await testTaxonomy.terms().create({
+		term: 'test term',
+	});
+
+	const loggeduser = await User.create(researcherUser);
+
+	const updatedTerm = newTerm.toJSON();
+
+	const newMeta = {
+		meta_key: 'new-meta-key',
+		meta_value: 'new meta value',
+	};
+
+	updatedTerm.metas = [newMeta];
+
+	const response = await client
+		.put(`/terms/${newTerm.id}`)
+		.send(updatedTerm)
+		.loginVia(loggeduser, 'jwt')
+		.end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset({
+		metas: [newMeta],
+	});
+});
+
+test('PUT /terms/:id update Term metadata value', async ({ client }) => {
+	const testTaxonomy = await Taxonomy.create(taxonomy);
+
+	const newTerm = await testTaxonomy.terms().create({
+		term: 'test term',
+	});
+
+	const loggeduser = await User.create(researcherUser);
+
+	const meta = {
+		meta_key: 'new-meta-key',
+		meta_value: 'new meta value',
+	};
+	const metaInst = await TermMeta.create(meta);
+	await newTerm.metas().save(metaInst);
+
+	const updatedTerm = newTerm.toJSON();
+	updatedTerm.metas = [
+		{
+			meta_key: 'new-meta-key',
+			meta_value: 'updated meta value',
+		},
+	];
+
+	const response = await client
+		.put(`/terms/${newTerm.id}`)
+		.send(updatedTerm)
+		.loginVia(loggeduser, 'jwt')
+		.end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset({
+		metas: [
+			{
+				meta_key: 'new-meta-key',
+				meta_value: 'updated meta value',
+			},
+		],
+	});
+});
+
+test('PUT /terms/:id/meta update metadata value', async ({ client }) => {
+	const testTaxonomy = await Taxonomy.create(taxonomy);
+
+	const newTerm = await testTaxonomy.terms().create({
+		term: 'test term',
+	});
+
+	const loggeduser = await User.create(researcherUser);
+
+	const meta = {
+		meta_key: 'meta-key',
+		meta_value: 'meta value',
+	};
+	const metaInst = await TermMeta.create(meta);
+	await newTerm.metas().save(metaInst);
+
+	const updatedMeta = {
+		meta_key: 'meta-key',
+		meta_value: 'updated meta value',
+	};
+
+	const response = await client
+		.put(`/terms/${newTerm.id}/meta`)
+		.send(updatedMeta)
+		.loginVia(loggeduser, 'jwt')
+		.end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(updatedMeta);
+});
+
+test('PUT /terms/:id/meta creates a new term metadata', async ({ client }) => {
+	const testTaxonomy = await Taxonomy.create(taxonomy);
+
+	const newTerm = await testTaxonomy.terms().create({
+		term: 'test term',
+	});
+
+	const loggeduser = await User.create(researcherUser);
+
+	const meta = {
+		meta_key: 'new-meta-key',
+		meta_value: 'new meta value',
+	};
+
+	const response = await client
+		.put(`/terms/${newTerm.id}/meta`)
+		.send(meta)
+		.loginVia(loggeduser, 'jwt')
+		.end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset(meta);
+});
+
+test('PUT /terms/:id deletes metadata with empty meta array', async ({ client }) => {
+	const testTaxonomy = await Taxonomy.create(taxonomy);
+
+	const newTerm = await testTaxonomy.terms().create({
+		term: 'test term',
+	});
+
+	const loggeduser = await User.create(researcherUser);
+
+	const meta = {
+		meta_key: 'new-meta-key',
+		meta_value: 'new meta value',
+	};
+	const metaInst = await TermMeta.create(meta);
+	await newTerm.metas().save(metaInst);
+
+	const updatedTerm = newTerm.toJSON();
+	updatedTerm.metas = [];
+
+	const response = await client
+		.put(`/terms/${newTerm.id}`)
+		.send(updatedTerm)
+		.loginVia(loggeduser, 'jwt')
+		.end();
+
+	response.assertStatus(200);
+	response.assertJSONSubset({
+		metas: [],
 	});
 });
 

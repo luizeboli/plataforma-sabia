@@ -26,6 +26,8 @@ const StyledForm = styled.form`
 export const Actions = styled.div`
 	display: flex;
 	justify-content: ${({ center }) => (center ? 'center' : 'flex-end')};
+	flex-direction: ${({ column }) => (column ? 'column' : 'row')};
+
 	> a[href] {
 		align-self: center;
 		padding: 0 1rem;
@@ -33,7 +35,7 @@ export const Actions = styled.div`
 
 	> button {
 		margin-top: 0.5rem;
-		margin-left: 1.5rem;
+		margin-left: ${({ column }) => (column ? 0 : 1.5)}rem;
 	}
 
 	@media (max-width: ${({ theme }) => theme.screens.medium}px) {
@@ -54,11 +56,11 @@ export const Actions = styled.div`
  *
  * @returns {React.Element}
  */
-export const Form = ({ onSubmit, children }) => {
-	const methods = useForm();
+export const Form = ({ onSubmit, children, defaultValues }) => {
+	const methods = useForm({ defaultValues });
 
 	return (
-		<StyledForm onSubmit={methods.handleSubmit(onSubmit)}>
+		<StyledForm onSubmit={methods.handleSubmit((data) => onSubmit(data, methods))}>
 			{React.Children.map(children, (child) => {
 				return typeof child?.type === 'function'
 					? React.cloneElement(child, {
@@ -74,10 +76,12 @@ export const Form = ({ onSubmit, children }) => {
 Form.propTypes = {
 	children: PropTypes.node.isRequired,
 	onSubmit: PropTypes.func,
+	defaultValues: PropTypes.shape({}),
 };
 
 Form.defaultProps = {
 	onSubmit: () => {},
+	defaultValues: {},
 };
 
 export default Form;

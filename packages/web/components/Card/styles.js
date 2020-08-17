@@ -5,7 +5,6 @@ export const CardContainer = styled.div`
 	flex-direction: column;
 	background-color: ${({ theme }) => theme.colors.white};
 	transition: all 0.3s ease 0s;
-	max-width: 40rem;
 
 	:hover {
 		transform: translateY(-0.7rem);
@@ -89,23 +88,6 @@ export const PrivateContainer = styled.div`
 	}
 `;
 
-export const LikesContainer = styled.div`
-	display: flex;
-	align-items: center;
-
-	span {
-		font-size: 1.3rem;
-		color: ${({ theme }) => theme.colors.lightGray};
-		display: inline-block;
-		margin-left: 0.5rem;
-	}
-
-	svg {
-		width: ${({ theme }) => theme.sizes.defaultIcon}rem;
-		height: ${({ theme }) => theme.sizes.defaultIcon}rem;
-	}
-`;
-
 export const MainTitle = styled.h3`
 	margin-bottom: 5rem;
 `;
@@ -130,8 +112,7 @@ export const CalendarText = styled.div`
 	align-items: center;
 
 	span {
-		color: ${({ theme }) => theme.colors.mediumGray};
-		font-weight: 500;
+		color: ${({ theme }) => theme.colors.secondary};
 		margin-left: 0.5rem;
 		display: block;
 	}

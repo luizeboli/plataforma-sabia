@@ -2,6 +2,8 @@
 const Model = use('Model');
 const Role = use('App/Models/Role');
 const Technology = use('App/Models/Technology');
+const TechnologyReview = use('App/Models/TechnologyReview');
+const Upload = use('App/Models/Upload');
 const CE = require('@adonisjs/lucid/src/Exceptions');
 const { permissions, matchesPermission } = require('../Utils');
 
@@ -42,13 +44,22 @@ class Permission extends Model {
 	}
 
 	static async checkIndividualPermission(user, matchedPermission, params) {
-		/** Individual User Permissions */
 		const { id, idUser, idTechnology } = params;
 		const userResourceId = id || idUser;
 		const techonologyResourceId = id || idTechnology;
 
+		/** Individual User Permissions */
 		if (
-			matchesPermission([permissions.UPDATE_USER, permissions.UPDATE_USER], matchedPermission)
+			matchesPermission(
+				[
+					permissions.VIEW_USER,
+					permissions.UPDATE_USER,
+					permissions.DELETE_USER,
+					permissions.LIST_BOOKMARK,
+					permissions.DELETE_BOOKMARK,
+				],
+				matchedPermission,
+			)
 		) {
 			if (user.id.toString() !== userResourceId) {
 				return false;
@@ -65,6 +76,21 @@ class Permission extends Model {
 			const technology = await Technology.findOrFail(techonologyResourceId);
 			const technologyOwner = await technology.getOwner();
 			if (!technologyOwner || technologyOwner.id !== user.id) {
+				return false;
+			}
+		}
+		/** Individual Technology Review Permissions */
+		if (matchesPermission([permissions.UPDATE_TECHNOLOGY_REVIEW], matchedPermission)) {
+			const technologyReview = await TechnologyReview.findOrFail(id);
+			if (technologyReview.user_id !== user.id) {
+				return false;
+			}
+		}
+
+		/** Individual Uploads Permissions */
+		if (matchesPermission([permissions.DELETE_UPLOAD], matchedPermission)) {
+			const upload = await Upload.findOrFail(id);
+			if (upload.user_id !== user.id) {
 				return false;
 			}
 		}

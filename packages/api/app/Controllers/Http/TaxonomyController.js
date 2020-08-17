@@ -2,8 +2,9 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 
 const Taxonomy = use('App/Models/Taxonomy');
+const Term = use('App/Models/Term');
 
-const { antl, errors, errorPayload } = require('../../Utils');
+const { errors, errorPayload } = require('../../Utils');
 
 class TaxonomyController {
 	/**
@@ -11,8 +12,11 @@ class TaxonomyController {
 	 * GET taxonomies
 	 */
 	async index({ request }) {
+		const filters = request.all();
+
 		return Taxonomy.query()
 			.withParams(request.params)
+			.withFilters(filters)
 			.fetch();
 	}
 
@@ -29,19 +33,30 @@ class TaxonomyController {
 	 * Get a single taxonomy.
 	 * GET taxonomies/:id
 	 */
-	async show({ params }) {
-		const { id } = params;
-		return Taxonomy.getTaxonomy(id);
+	async show({ request }) {
+		const filters = request.all();
+
+		return Taxonomy.query()
+			.getTaxonomy(request.params.id)
+			.withParams(request.params)
+			.withFilters(filters)
+			.firstOrFail();
 	}
 
 	/**
 	 * Get a taxonomy terms.
 	 * GET taxonomies/:id/terms
 	 */
-	async showTerms({ params }) {
-		const { id } = params;
-		const taxonomy = await Taxonomy.getTaxonomy(id);
-		return taxonomy.terms().fetch();
+	async showTerms({ request, params }) {
+		const filters = request.all();
+		// using getTaxonomy to yield errors if taxonomy does not exist
+		const taxonomy = await Taxonomy.getTaxonomy(params.id);
+		filters.taxonomy = taxonomy.id;
+
+		return Term.query()
+			.withParams(request.params, { filterById: false })
+			.withFilters(filters)
+			.fetch();
 	}
 
 	/**
@@ -61,7 +76,7 @@ class TaxonomyController {
 	 * Delete a taxonomy with id.
 	 * DELETE taxonomies/:id
 	 */
-	async destroy({ params, response }) {
+	async destroy({ params, request, response }) {
 		const { id } = params;
 		const taxonomy = await Taxonomy.getTaxonomy(id);
 		const result = await taxonomy.delete();
@@ -71,7 +86,7 @@ class TaxonomyController {
 				.send(
 					errorPayload(
 						errors.RESOURCE_DELETED_ERROR,
-						antl('error.resource.resourceDeletedError'),
+						request.antl('error.resource.resourceDeletedError'),
 					),
 				);
 		}

@@ -4,7 +4,7 @@ import { Card } from '../components/Card';
 import { ContentContainer } from '../components/Common';
 import { CardsWrapper } from '../components/TechnologiesSection/styles';
 import { theme } from '../styles';
-import { technologies } from '../utils/fakeData';
+import { technologies } from './utils/fakeData';
 
 export default {
 	title: 'Card',
@@ -30,26 +30,24 @@ export const Grid = () => {
 						id,
 						title,
 						category,
-						price,
-						logo,
-						place,
+						privateTechnology,
+						patent,
+						thumbnail,
 						date,
 						likes,
-						weeks,
-						region,
+						installation_time,
 						url,
 					}) => (
 						<Card
 							key={id}
 							title={title}
 							category={category}
-							price={price}
-							logo={logo}
-							place={place}
+							privateTechnology={privateTechnology}
+							patent={patent}
+							thumbnail={thumbnail}
 							date={date}
 							likes={likes}
-							weeks={weeks}
-							region={region}
+							installation_time={installation_time}
 							url={url}
 						/>
 					),

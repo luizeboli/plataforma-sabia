@@ -10,7 +10,6 @@
 */
 /** @type {import('@adonisjs/lucid/src/Factory')} */
 const Factory = use('Factory');
-const slugify = require('slugify');
 
 Factory.blueprint('App/Models/User', async (faker) => {
 	return {
@@ -19,6 +18,17 @@ Factory.blueprint('App/Models/User', async (faker) => {
 		first_name: faker.string(),
 		last_name: faker.string(),
 		company: faker.string(),
+		zipcode: faker.zip(),
+		cpf: faker.string({ length: 11, numeric: true }),
+		birth_date: faker.date(),
+		phone_number: faker.string({ length: 11, numeric: true }),
+		lattes_id: faker.string({ length: 11, numeric: true }),
+		address: faker.string(),
+		address2: faker.string(),
+		district: faker.string(),
+		city: faker.string(),
+		state: faker.string(),
+		country: faker.string(),
 		role_id: 1,
 	};
 });
@@ -26,11 +36,9 @@ Factory.blueprint('App/Models/User', async (faker) => {
 Factory.blueprint('App/Models/Technology', (faker) => {
 	return {
 		title: faker.sentence({ words: 3 }),
-		slug: slugify(faker.sentence({ words: 3 }), { lower: true }),
 		description: faker.paragraph(),
 		private: faker.bool(),
-		thumbnail: 'https://rocketfinalchallenge.s3.amazonaws.com/card-image.jpg',
-		likes: faker.integer({ min: 0, max: 200 }),
+		likes: 0,
 		patent: faker.bool(),
 		patent_number: faker.string({ length: 8, alpha: true, numeric: true }),
 		primary_purpose: faker.paragraph(),
@@ -49,6 +57,39 @@ Factory.blueprint('App/Models/Technology', (faker) => {
 
 Factory.blueprint('App/Models/Term', async (faker) => {
 	return {
-		term: faker.string({ length: 10 }),
+		term: faker.animal(),
+	};
+});
+
+Factory.blueprint('App/Models/TechnologyReview', async (faker) => {
+	return {
+		content: faker.paragraph(),
+		rating: faker.integer({ min: 1, max: 5 }),
+		positive: JSON.stringify([faker.sentence(), faker.sentence()]),
+		negative: JSON.stringify([faker.sentence(), faker.sentence()]),
+	};
+});
+
+Factory.blueprint('App/Models/TechnologyCost', async (faker) => {
+	return {
+		funding_required: true,
+		funding_type: faker.pickone(['public', 'private', 'collective']),
+		funding_value: faker.integer({ min: 10, max: 100000000 }),
+		funding_status: faker.pickone(['not_acquired', 'acquiring', 'acquired']),
+		notes: faker.paragraph(),
+	};
+});
+
+Factory.blueprint('App/Models/Cost', async (faker) => {
+	return {
+		cost_type: faker.pickone([
+			'development_costs',
+			'implementation_costs',
+			'maintenance_costs',
+		]),
+		description: faker.sentence({ words: 10 }),
+		type: faker.pickone(['service', 'equipment', 'others', 'raw_input']),
+		quantity: faker.integer({ min: 1, max: 100 }),
+		value: faker.integer({ min: 10, max: 100000000 }),
 	};
 });

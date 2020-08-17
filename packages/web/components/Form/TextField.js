@@ -10,7 +10,7 @@ import Help from './Help';
 export const StyledTextArea = styled.textarea`
 	width: 100%;
 	height: 12rem;
-	font-size: 1.2rem;
+	font-size: 1.4rem;
 	margin: 0.5rem 0;
 	padding: 1rem;
 	background: white;
@@ -38,7 +38,7 @@ const TextField = ({ name, label, form, help, validation, ...inputProps }) => {
 				/>
 				{help && <Help id={name} HelpComponent={help} />}
 			</Row>
-			<InputError>{validationErrorMessage(errors[name], t)}</InputError>
+			<InputError>{validationErrorMessage(errors, name, t)}</InputError>
 		</InputFieldWrapper>
 	);
 };

@@ -1,10 +1,17 @@
 const theme = {
 	colors: {
-		primary: 'hsla(4, 85%, 57%)',
-		secondary: 'hsla(233, 81%, 54%)',
+		primary: 'hsla(29, 94%, 62%)',
+		secondary: 'hsl(166, 100%, 34%)',
+		darkGreen: 'hsla(146, 64%, 36%)',
+		darkOrange: 'hsla(29, 73%, 56%)',
+		red: 'hsla(4, 85%, 57%)',
 		white: 'hsla(0, 0%, 100%)',
 		black: 'hsla(204, 7%, 15%)',
 		lightGray: 'hsla(0, 0%, 40%)',
+		lightGray2: 'hsla(0, 0%, 52%)',
+		lightGray3: 'hsl(0, 0%, 74%)',
+		lightGray4: 'hsl(0, 0%, 93%)',
+		lightBlue: 'hsla(195, 86%, 64%)',
 		mediumGray: 'hsla(0, 0%, 80%)',
 		darkGray: 'hsla(0, 0%, 7%)',
 		gray98: 'hsla(0, 0%, 95%)',
@@ -13,12 +20,8 @@ const theme = {
 		darkWhite: 'hsla(0, 0%, 100%, 0.07)',
 		whiteSmoke: 'hsla(0, 0%, 98%)',
 		border: 'hsla(0, 0%, 93%)',
-		orange: 'hsla(38, 100%, 51%)',
-		green: 'hsla(146, 64%, 36%)',
-		lightGreen: 'hsl(146, 76%, 46%)',
 		cyan: 'hsla(195, 86%, 64%)',
 		blue: 'hsla(204, 70%, 53%)',
-		yellow: 'hsla(45, 100%, 51%)',
 	},
 	// rem
 	sizes: {
@@ -28,6 +31,7 @@ const theme = {
 	},
 	metrics: {
 		containerWidth: 128,
+		smallRadius: 0.3,
 		baseRadius: 0.5,
 		doubleRadius: 1,
 	},
