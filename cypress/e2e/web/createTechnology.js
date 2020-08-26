@@ -2,18 +2,15 @@ describe('technology form validation', () => {
 	beforeEach(() => {
 		cy.authenticate().visit('/technology/new');
 	});
-
 	it('step 1 - must fill required fields', () => {
 		cy.get('input[name=title]').type('Minha tecnologia');
 		cy.get('textarea[name=description]').type('Descrição da tecnologia');
 		cy.findByText(/salvar e continuar/i).click();
 		cy.findAllByText(/este campo é obrigatório/i).should('exist');
 	});
-
 	it('step 1 - selecting a category renders subcategories', () => {
 		cy.findByText(/escolha uma categoria primeiro/i).should('exist');
 		cy.select('terms.category', { exactMatch: true });
-
 		cy.findByText(/escolha uma categoria primeiro/i).should('not.exist');
 		cy.findByText(/escolha a sub categoria/i).should('exist');
 	});
@@ -67,45 +64,32 @@ describe('creating/editing technology', () => {
 
 			cy.findByText(/salvar e continuar/i).click();
 
-			cy.get('[name="technologyCosts.costs.development_costs_add_button"]').click();
-			cy.get('[name="technologyCosts.costs.development_costs[0]_remove_button"').should(
-				'exist',
-			);
-
-			cy.get('[name="technologyCosts.costs.development_costs[0].description"]').type(
-				'coolest description',
-			);
-			cy.get('[name="technologyCosts.costs.development_costs[0].quantity"]').type('2');
-			cy.get('[name="technologyCosts.costs.development_costs[0].value"]').type('20');
-			cy.select('technologyCosts.costs.development_costs[0].type');
-			cy.findAllByText(/40\.00/i).should('exist');
-
-			cy.get('[name="technologyCosts.costs.development_costs_add_button"]').click();
-			cy.get('[name="technologyCosts.costs.development_costs[1]_remove_button"').should(
-				'exist',
-			);
-
-			cy.get('[name="technologyCosts.costs.development_costs[1].description"]').type(
-				'coolest description',
-			);
-			cy.get('[name="technologyCosts.costs.development_costs[1].quantity"]').type('3');
-			cy.get('[name="technologyCosts.costs.development_costs[1].value"]').type('7');
-			cy.select('technologyCosts.costs.development_costs[1].type');
-			cy.findAllByText(/21\.00/i).should('exist');
-			cy.findAllByText(/61\.00/i).should('exist');
-
 			cy.get('[name="technologyCosts.costs.implementation_costs_add_button"]').click();
 			cy.get('[name="technologyCosts.costs.implementation_costs[0]_remove_button"').should(
 				'exist',
 			);
 
 			cy.get('[name="technologyCosts.costs.implementation_costs[0].description"]').type(
-				'coolest description 2',
+				'coolest description',
 			);
-			cy.get('[name="technologyCosts.costs.implementation_costs[0].quantity"]').type('1');
-			cy.get('[name="technologyCosts.costs.implementation_costs[0].value"]').type('15');
+			cy.get('[name="technologyCosts.costs.implementation_costs[0].quantity"]').type('2');
+			cy.get('[name="technologyCosts.costs.implementation_costs[0].value"]').type('20');
 			cy.select('technologyCosts.costs.implementation_costs[0].type');
-			cy.findAllByText(/15\.00/i).should('exist');
+			cy.findAllByText(/40\.00/i).should('exist');
+
+			cy.get('[name="technologyCosts.costs.implementation_costs_add_button"]').click();
+			cy.get('[name="technologyCosts.costs.implementation_costs[1]_remove_button"').should(
+				'exist',
+			);
+
+			cy.get('[name="technologyCosts.costs.implementation_costs[1].description"]').type(
+				'coolest description',
+			);
+			cy.get('[name="technologyCosts.costs.implementation_costs[1].quantity"]').type('3');
+			cy.get('[name="technologyCosts.costs.implementation_costs[1].value"]').type('7');
+			cy.select('technologyCosts.costs.implementation_costs[1].type');
+			cy.findAllByText(/21\.00/i).should('exist');
+			cy.findAllByText(/61\.00/i).should('exist');
 
 			cy.get('[name="technologyCosts.costs.maintenence_costs_add_button"]').click();
 			cy.get('[name="technologyCosts.costs.maintenence_costs[0]_remove_button"').should(
@@ -131,11 +115,30 @@ describe('creating/editing technology', () => {
 
 			cy.findByText(/salvar e continuar/i).click();
 
-			cy.get('[name="who_develop[0]_remove_button"').should('exist');
 			cy.select('where_can_be_applied');
 
 			cy.findByText(/salvar e continuar/i).click();
+
+			cy.findByText(new RegExp(technologyData.title, 'i')).should('be.visible');
 			cy.findByText(/salvar e continuar/i).should('not.exist');
+			cy.findByText(/voltar/i).should('exist');
+
+			cy.get('input[name=acceptUsageTerms]').click();
+			cy.get('input[name=acceptPrivacyTerms]').click();
+
+			cy.findByText(/concluir/i)
+				.should('exist')
+				.click();
+
+			const toastMessage = /você será redicionado para as suas tecnologias/gim;
+
+			cy.findByText(toastMessage).should('exist');
+
+			// eslint-disable-next-line cypress/no-unnecessary-waiting
+			cy.wait(6000);
+
+			cy.findByText(toastMessage).should('not.exist');
+			cy.url().should('include', '/user/my-account/technologies');
 		});
 	});
 });
