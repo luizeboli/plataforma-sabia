@@ -78,6 +78,7 @@ class TechnologyController {
 					builder.where('id', technology.id);
 				})
 				.where('taxonomy_id', taxonomy.id)
+				.withParams(request.params, { filterById: false })
 				.fetch();
 		}
 
@@ -85,6 +86,7 @@ class TechnologyController {
 			.whereHas('technologies', (builder) => {
 				builder.where('id', technology.id);
 			})
+			.withParams(request.params, { filterById: false })
 			.fetch();
 	}
 
@@ -158,7 +160,7 @@ class TechnologyController {
 
 	/**
 	 * Delete a technology user.
-	 * DELETE technologies/:idTechnology/users/:idUser
+	 * DELETE technologies/:id/users/:idUser
 	 */
 	async deleteTechnologyUser({ params, response }) {
 		const { id, idUser } = params;
@@ -372,6 +374,26 @@ class TechnologyController {
 		return technology.users().fetch();
 	}
 
+	/** POST technologies/:id/terms */
+	async associateTechnologyTerm({ params, request }) {
+		const { id } = params;
+		const technology = await Technology.findOrFail(id);
+		const { terms } = request.only(['terms']);
+		let trx;
+		try {
+			const { init, commit } = getTransaction();
+			trx = await init();
+
+			await this.syncronizeTerms(trx, terms, technology);
+
+			await commit();
+		} catch (error) {
+			trx.rollback();
+			throw error;
+		}
+		return technology.terms().fetch();
+	}
+
 	/**
 	 * Update technology details.
 	 * PUT or PATCH technologies/:id
@@ -408,7 +430,7 @@ class TechnologyController {
 
 			await commit();
 
-			await technology.loadMany(['users', 'terms.taxonomy']);
+			await technology.loadMany(['users', 'terms.taxonomy', 'terms.metas']);
 		} catch (error) {
 			await trx.rollback();
 			throw error;
