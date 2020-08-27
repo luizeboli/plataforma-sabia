@@ -1,6 +1,5 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model');
-const Env = use('Env');
 const { incrementSlugSuffix } = require('../Utils/slugify');
 
 class Upload extends Model {
@@ -15,7 +14,7 @@ class Upload extends Model {
 
 	getUrl() {
 		const uploadPath = this.object ? `uploads/${this.object}` : 'uploads';
-		return `${Env.get('APP_URL')}/${uploadPath}/${this.filename}`;
+		return `https://api-sabia.marcusdev.com.br/${uploadPath}/${this.filename}`;
 	}
 
 	static async getUniqueFileName(file, object = null) {
